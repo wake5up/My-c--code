@@ -1175,6 +1175,7 @@ int main()
 }
 #endif
 
+#if 1
 // ÁâĞÎĞéÄâ¼Ì³Ğ
 class B
 {
@@ -1204,6 +1205,7 @@ int main()
 {
 	cout << sizeof(D) << endl;
 
+#if 0
 	D d;
 	d._b = 1;  // ÁâĞÎ¼Ì³ĞÈ±Ïİ£º»á´æÔÚ¶şÒåĞÔÎÊÌâ
 
@@ -1214,5 +1216,42 @@ int main()
 	d._c2 = 4;
 
 	d._d = 5;
+#endif
+
+	// ÁâĞÎĞéÄâ¼Ì³Ğ
+
+	D d;
+	d._b = 1;
+	d._c1 = 2;
+	d._c2 = 3;
+	d._d = 4;
 	return 0;
 }
+#endif
+
+#if 0
+// ĞéÄâ¼Ì³Ğ
+class B
+{
+public:
+	int _b;
+};
+
+class D : virtual public B
+{
+public:
+	int _d;
+};
+
+
+int main()
+{
+	cout << sizeof(D) << endl;
+
+	D d;
+	d._b = 1;
+	d._d = 2;
+
+	return 0;
+}
+#endif
