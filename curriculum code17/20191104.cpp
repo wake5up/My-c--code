@@ -455,6 +455,7 @@ int main()
 }
 #endif
 
+#if 0
 class Base
 {
 public:
@@ -479,9 +480,9 @@ public:
 class Derived : public Base
 {
 public:
-	virtual void TestFunc4()
+	virtual void TestFunc5()
 	{
-		cout << "Derived::TestFunc4()" << endl;
+		cout << "Derived::TestFunc5()" << endl;
 	}
 
 	virtual void TestFunc1()
@@ -494,19 +495,39 @@ public:
 		cout << "Derived::TestFunc3()" << endl;
 	}
 
-	virtual void TestFunc5()
+	virtual void TestFunc4()
 	{
-		cout << "Derived::TestFunc5()" << endl;
+		cout << "Derived::TestFunc4()" << endl;
 	}
 
 	int _d;
 };
 
+typedef void (*PVFT)();
 
+void PrintTable(Base& b, const string& str)
+{
+	cout << str << endl;
+	//&b;  // 指向对象本身
+	//(int*)&b; // 指向对象的前4个字节
+	//*(int*)&b; // 对象前4个字节中内容--->是整形数字
+
+	// 将整形数字转化成表格的首地址--->需要知道表格中元素的类型--->前期已经假设表格中存储的是虚函数的地址
+	PVFT* pVFT = (PVFT*)(*(int*)&b);
+
+	while (*pVFT)
+	{
+		(*pVFT)();
+		++pVFT;
+	}
+	cout << endl;
+}
 
 int main()
 {
 	cout << sizeof(Base) << endl;
+
+	Base b1, b2;
 
 	Base b;
 	b._b = 1;
@@ -514,6 +535,218 @@ int main()
 	cout << sizeof(Derived) << endl;
 	Derived d;
 	d._b = 1;
+	d._d = 2;
 
+	PrintTable(b, "Base VFT:");
+	PrintTable(d, "Derived VFT:");
+
+	// 确认TestFunc4和TestFunc5的入口地址
+	d.TestFunc4();
+	d.TestFunc5();
+
+
+
+	return 0;
+}
+#endif
+
+#if 0
+class Base
+{
+public:
+	virtual void TestFunc1()
+	{
+		cout << "Base::TestFunc1()" << endl;
+	}
+
+	virtual void TestFunc2()
+	{
+		cout << "Base::TestFunc2()" << endl;
+	}
+
+	virtual void TestFunc3()
+	{
+		cout << "Base::TestFunc3()" << endl;
+	}
+
+	void TestFunc4()
+	{
+		cout << "Base::TestFunc4()" << endl;
+	}
+
+	int _b;
+};
+
+class Derived : public Base
+{
+public:
+	virtual void TestFunc1()
+	{
+		cout << "Derived::TestFunc1()" << endl;
+	}
+
+	virtual void TestFunc2()
+	{
+		cout << "Derived::TestFunc2()" << endl;
+	}
+
+	virtual void TestFunc3()
+	{
+		cout << "Derived::TestFunc3()" << endl;
+	}
+
+	int _d;
+};
+
+// 虚函数的调用：通过基类的指针或者引用调用虚函数
+void TestVirtual(Base* pb)
+{
+	pb->TestFunc1(); // call Base::TestFunc1
+	pb->TestFunc2(); // call Base::TestFunc2
+	pb->TestFunc3(); // call Base::TestFunc3
+	pb->TestFunc4(); // call Base::TestFunc4
+}
+
+int main()
+{
+	Base b;
+	Derived d;
+
+	TestVirtual(&b);
+	TestVirtual(&d);
+
+	// 
+	Base* pb = (Base*)&d;
+	pb->TestFunc1();
+	return 0;
+}
+#endif
+
+#if 0
+// 带有虚函数的多继承派生类的对象模型
+
+// 8
+class B1
+{
+public:
+	virtual void TestFunc1()
+	{
+		cout << "B1::TestFunc1()" << endl;
+	}
+
+	virtual void TestFunc2()
+	{
+		cout << "B1::TestFunc2()" << endl;
+	}
+	int _b1;
+};
+
+// 8
+class B2
+{
+public:
+	virtual void TestFunc3()
+	{
+		cout << "B2::TestFunc3()" << endl;
+	}
+
+	virtual void TestFunc4()
+	{
+		cout << "B2::TestFunc4()" << endl;
+	}
+	int _b2;
+};
+
+// 20   24
+class D : public B1, public B2
+{
+public:
+	virtual void TestFunc1()
+	{
+		cout << "D::TestFunc1()" << endl;
+	}
+
+	virtual void TestFunc4()
+	{
+		cout << "D::TestFunc4()" << endl;
+	}
+
+	virtual void TestFunc5()
+	{
+		cout << "D::TestFunc5()" << endl;
+	}
+
+	int _d;
+};
+
+
+typedef void(*PVFT)();
+
+void PrintVFT1(B1& b, const string& str)
+{
+	cout << "D重写B1基类的虚表" << endl;
+	PVFT* pVFT = (PVFT*)(*(int*)&b);
+	while (*pVFT)
+	{
+		(*pVFT)();
+		++pVFT;
+	}
+	cout << endl;
+}
+
+void PrintVFT2(B2& b, const string& str)
+{
+	cout << str << endl;
+	PVFT* pVFT = (PVFT*)(*(int*)&b);
+	while (*pVFT)
+	{
+		(*pVFT)();
+		++pVFT;
+	}
+	cout << endl;
+}
+
+int main()
+{
+	cout << sizeof(D) << endl;
+
+	D d;
+	d._b1 = 1;
+	d._b2 = 2;
+	d._d = 3;
+
+	PrintVFT1(d, "D重写B1基类的虚表");
+	PrintVFT2(d, "D重写B2基类的虚表");
+
+	return 0;
+}
+// 自己研究：菱形继承&菱形虚拟继承---增加虚函数
+#endif
+
+// 虚函数一定是成员函数，成员函数不一定全部都可以作为虚函数
+// 验证：类中那些函数可以作为虚函数
+class Base
+{
+public:
+	virtual inline void Test1()
+	{}
+
+	virtual static void Test2()
+	{}
+
+
+};
+
+void TestVirtual(Base* pb)
+{
+	// 假设已经是内联函数--->如果编译器将一个函数作为内联函数处理
+	// 在编译阶段，会将该函数展开
+	// 如果展开，就先不要通过虚表调用，就不能实现多态
+	// 结论：内联函数不能作为虚函数
+	pb->Test2();
+}
+
+int main()
+{
 	return 0;
 }
