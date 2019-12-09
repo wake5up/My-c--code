@@ -253,7 +253,7 @@ int main()
 #if 0
 // 借助string来解决浅拷贝问题
 // string类动态管理字符串
-namespace bite
+namespace ht
 {
 	// 反例
 	class string
@@ -299,9 +299,9 @@ namespace bite
 
 void TestString()
 {
-	bite::string s1("hello");
-	bite::string s2(nullptr);
-	// bite::string s3(s1);  // 默认的拷贝构造是浅拷贝
+	ht::string s1("hello");
+	ht::string s2(nullptr);
+	// ht::string s3(s1);  // 默认的拷贝构造是浅拷贝
 	
 	// 调用编译器提供的默认赋值运算符重载
 	s2 = s1;
@@ -315,7 +315,7 @@ int main()
 #endif
 
 #if 0
-namespace bite
+namespace ht
 {
 	// 深拷贝--传统版
 	class string
@@ -368,7 +368,7 @@ namespace bite
 #endif
 
 #if 0
-namespace bite
+namespace ht
 {
 	// 深拷贝--简介版
 	class string
@@ -428,9 +428,9 @@ namespace bite
 
 void TestString()
 {
-	bite::string s1("hello");
-	bite::string s2(s1);
-	//bite::string s3;
+	ht::string s1("hello");
+	ht::string s2(s1);
+	//ht::string s3;
 
 	//s3 = s1;
 }
@@ -448,7 +448,7 @@ int main()
 // 在类中增加int类的成员变量-----不行
 // 普通的整形成员变量，每个对象中都有一份，一个对象在修改该计数时候，不会影响其他对象
 // 导致：资源没有释放
-namespace bite
+namespace ht
 {
 	class string
 	{
@@ -500,7 +500,7 @@ namespace bite
 // 将计数给成静态类型的成员变量---->不行
 // 原因：静态类型成员变量是所有对象共享
 //      计数应该与资源个数保持一致
-namespace bite
+namespace ht
 {
 	class string
 	{
@@ -554,7 +554,7 @@ namespace bite
 
 
 #if 0
-namespace bite
+namespace ht
 {
 	class string
 	{
@@ -654,11 +654,11 @@ namespace bite
 
 void TestString()
 {
-	bite::string s1("hello");
-	bite::string s2(s1);
+	ht::string s1("hello");
+	ht::string s2(s1);
 
-	bite::string s3("wrold");
-	bite::string s4(s3);
+	ht::string s3("wrold");
+	ht::string s4(s3);
 
 	// s3不需要释放原来的资源，因为还有s4在用
 	s3 = s1;
@@ -680,7 +680,7 @@ int main()
 
 #include <assert.h>
 
-namespace bite
+namespace ht
 {
 	class string
 	{
@@ -848,7 +848,7 @@ namespace bite
 		bool operator<(const string& s);
 		bool operator<=(const string& s);
 		
-		friend ostream& operator<<(ostream& _cout, const bite::string& s)
+		friend ostream& operator<<(ostream& _cout, const ht::string& s)
 		{
 			_cout << s.c_str();
 			return _cout;
@@ -922,11 +922,11 @@ namespace bite
 
 void TestString1()
 {
-	bite::string s1;
-	bite::string s2("hello");
-	bite::string s3(s2);
-	bite::string s4(10, '$');
-	bite::string s5(s2.begin(), s2.end());
+	ht::string s1;
+	ht::string s2("hello");
+	ht::string s3(s2);
+	ht::string s4(10, '$');
+	ht::string s5(s2.begin(), s2.end());
 
 	for (auto e : s2)
 		cout << e;
@@ -936,7 +936,7 @@ void TestString1()
 		cout << s3[i];
 	cout << endl;
 
-	//bite::string::iterator it = s4.begin();
+	//ht::string::iterator it = s4.begin();
 	auto it = s4.begin();
 	while (it != s4.end())
 	{
@@ -948,7 +948,7 @@ void TestString1()
 
 void TestString2()
 {
-	bite::string s("hello");
+	ht::string s("hello");
 	cout << s.size() << endl;
 	cout << s.capacity() << endl;
 
@@ -967,7 +967,7 @@ void TestString2()
 
 void TestString3()
 {
-	bite::string s("hello");
+	ht::string s("hello");
 	
 	size_t pos1 = s.find('l');
 	cout << pos1 << endl;
