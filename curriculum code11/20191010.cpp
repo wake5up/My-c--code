@@ -195,7 +195,7 @@ int main()
 
 #include <assert.h>
 
-namespace bite
+namespace ht
 {
 	template<class T>
 	class vector
@@ -443,11 +443,11 @@ namespace bite
 
 void TestVector()
 {
-	bite::vector<int> v1;
-	bite::vector<int> v2(10, 5);
+	ht::vector<int> v1;
+	ht::vector<int> v2(10, 5);
 
 	int array[] = { 1, 2, 3, 4, 5 };
-	bite::vector<int> v3(array, array+sizeof(array)/sizeof(array[0]));
+	ht::vector<int> v3(array, array+sizeof(array)/sizeof(array[0]));
 
 	cout << v2.size() << endl;
 	cout << v2.capacity() << endl;
@@ -458,7 +458,7 @@ void TestVector()
 		cout << v3[i] << " ";
 	cout << endl;
 
-	//bite::vector<int>::iterator it = v3.begin();
+	//ht::vector<int>::iterator it = v3.begin();
 	auto it = v3.begin();
 	while (it != v3.end())
 	{
@@ -478,7 +478,7 @@ void TestVector()
 
 void TestVector2()
 {
-	bite::vector<int> v;
+	ht::vector<int> v;
 	v.push_back(1);  // 3
 	v.push_back(2);
 	v.push_back(3);
@@ -502,7 +502,7 @@ void TestVector2()
 void TestVector3()
 {
 	vector<int> vv;
-	bite::vector<int> v(10, 5);
+	ht::vector<int> v(10, 5);
 	cout << v.size() << endl;
 	cout << v.capacity() << endl;
 
