@@ -142,7 +142,7 @@ int main()
 }
 #endif
 
-namespace bite
+namespace ht
 {
 	// list: 带头结点双向循环链表
 	template<class T>
@@ -510,12 +510,12 @@ namespace bite
 #include <vector>
 void TestList1()
 {
-	bite::list<int> L1;
-	bite::list<int> L2(10, 5);
+	ht::list<int> L1;
+	ht::list<int> L2(10, 5);
 
 	vector<int> v{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 };
-	bite::list<int> L3(v.begin(), v.end());
-	bite::list<int> L4(L3);
+	ht::list<int> L3(v.begin(), v.end());
+	ht::list<int> L4(L3);
 
 	auto it = L2.begin();
 	while (it != L2.end())
@@ -540,7 +540,7 @@ void TestList1()
 
 void TestList2()
 {
-	bite::list<int> L;
+	ht::list<int> L;
 	L.push_back(1);
 	L.push_back(2);
 	L.push_back(3);
@@ -572,7 +572,7 @@ void TestList2()
 
 void TestList3()
 {
-	bite::list<int> L;
+	ht::list<int> L;
 	L.push_back(1);
 	L.push_back(2);
 	L.push_back(3);
