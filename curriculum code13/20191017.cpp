@@ -106,7 +106,7 @@ int main()
 
 #include <deque>
 
-namespace bite
+namespace ht
 {
 	template<class T, class Container = deque<T>>
 	class stack
@@ -204,7 +204,7 @@ namespace bite
 
 void TestStack()
 {
-	bite::stack<int> s1;
+	ht::stack<int> s1;
 	s1.push(1);
 	s1.push(2);
 	s1.push(3);
@@ -217,7 +217,7 @@ void TestStack()
 	cout << s1.size() << endl;
 	cout << s1.top() << endl;
 
-	bite::stack<int, vector<int>> s2;
+	ht::stack<int, vector<int>> s2;
 	s2.push(1);
 	s2.push(2);
 	s2.push(3);
@@ -229,7 +229,7 @@ void TestStack()
 #include <list>
 void Testqueue()
 {
-	bite::queue<int> q1;
+	ht::queue<int> q1;
 	q1.push(1);
 	q1.push(2);
 	q1.push(3);
@@ -244,7 +244,7 @@ void Testqueue()
 	cout << q1.front() << endl;
 	cout << q1.back() << endl;
 
-	bite::queue<int, list<int>> q2;
+	ht::queue<int, list<int>> q2;
 	q2.push(1);
 	q2.push(2);
 	q2.push(3);
@@ -270,7 +270,7 @@ int main()
 
 #include <vector>
 // priority_queue--->¶Ñ
-namespace bite
+namespace ht
 {
 	template<class T, class Container=vector<T>, class Compare=less<T>>
 	class priority_queue
@@ -373,13 +373,13 @@ int main()
 {
 	// 8  1  9  3  6  4  5  0  2  7
 	int array[] = {8,1,9,3,6,4,5,0,2,7};
-	bite::priority_queue<int> q(array, array+sizeof(array)/sizeof(array[0]));
+	ht::priority_queue<int> q(array, array+sizeof(array)/sizeof(array[0]));
 	cout << q.top() << endl;
 
 	q.pop();
 	cout << q.top() << endl;
 
-	bite::priority_queue<int, vector<int>, less<int>> q2;
+	ht::priority_queue<int, vector<int>, less<int>> q2;
 	q2.push(5);
 	q2.push(0);
 	q2.push(9);
