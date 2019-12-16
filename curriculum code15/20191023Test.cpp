@@ -5,7 +5,7 @@ using namespace std;
 // 非类型模板参数
 // C++11: array
 
-namespace bite
+namespace ht
 {
 	template<class T, size_t N>
 	class array
@@ -46,8 +46,8 @@ int main()
 	int b = 20;
 
 	// 非类型模板参数必须在编译其确认其结果
-	//bite::array<int, a+b> arr;
-	bite::array<int, 10+20> arr;
+	//ht::array<int, a+b> arr;
+	ht::array<int, 10+20> arr;
 	arr.push_back(1);
 	arr.push_back(2);
 	arr.push_back(3);
