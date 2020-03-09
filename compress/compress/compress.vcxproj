@@ -66,10 +66,15 @@
   <ItemGroup>
     <ClCompile Include="FileCompress.cpp" />
     <ClCompile Include="FileCompressTest.cpp" />
+    <ClCompile Include="LZ77.cpp" />
+    <ClCompile Include="LZHashTable.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common.h" />
     <ClInclude Include="FileCompress.h" />
     <ClInclude Include="HuffmanTree.hpp" />
+    <ClInclude Include="LZ77.h" />
+    <ClInclude Include="LZHashTable.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

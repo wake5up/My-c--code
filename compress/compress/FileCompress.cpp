@@ -10,48 +10,52 @@ FileCompress::FileCompress()
 	_CharInfo.resize(256);
 	for (size_t i = 0; i < 256; ++i)
 	{
-		_CharInfo[i]._ch = i;
-		_CharInfo[i]._count = 0;
+		_CharInfo[i]._ch = i;//字符
+		_CharInfo[i]._count = 0;//字符出现次数[权值]
 	}
 }
 
 //文件压缩函数
 void FileCompress::CompressFile(const string& strFilePath)
 {
-	FILE* Fin = fopen(strFilePath.c_str(),"rb");
+	FILE* Fin = fopen(strFilePath.c_str(),"rb");//二进制只读的方式打开文件
 	if (nullptr == Fin)
 	{
 		cout << "文件打开失败" << endl;
 		return;
 	}
-	unsigned char* pReadBuff = new unsigned char[1024];
+	unsigned char* pReadBuff = new unsigned char[1024];//读取数据的缓冲区
 	
 	while (1)
 	{
-		size_t rdSize = fread(pReadBuff,1,1024,Fin);
+		size_t rdSize = fread(pReadBuff,1,1024,Fin);//每次往pReadBuff缓冲区读1个字节，读取1024次
 		if (0 == rdSize)
 			break;
-		for (size_t i = 0; i < rdSize; ++i)
+		for (size_t i = 0; i < rdSize; ++i)//累计缓冲区字符出现的次数
 		{
 			_CharInfo[pReadBuff[i]]._count++;
 		}
 	}
 
 	HuffmanTree<CharInfo> ht;
-	ht.CreateHuffmanTree(_CharInfo,CharInfo(0));
-	GetHuffmanCode(ht.GetpRoot());
-	char ch = 0;
-	char bitcount = 0;
+	ht.CreateHuffmanTree(_CharInfo,CharInfo(0));//构建Huffman树
+	GetHuffmanCode(ht.GetpRoot());//获取字符编码
 
+	//确定压缩文件的压缩名
 	std::string strfilename(strFilePath.c_str());
 	size_t finish = strfilename.rfind('.');
 	std::string strUNname(strfilename.substr(0,finish));
 	strUNname += ".hzp";
-	FILE* Fout = fopen(strUNname.c_str(),"wb");
+
+	FILE* Fout = fopen(strUNname.c_str(),"wb");//二进制只写的方式打开
 	assert(Fout);
 
-	WriteHeadInfo(Fout,strFilePath);
-	fseek(Fin,0,SEEK_SET);
+	WriteHeadInfo(Fout,strFilePath);//写入压缩文件中的压缩信息
+	fseek(Fin,0,SEEK_SET);//把文件指针指向文件的开头
+
+	char ch = 0;
+	char bitcount = 0;
+
 	while (1)
 	{
 		size_t rdsize = fread(pReadBuff,1,1024,Fin);
@@ -59,23 +63,23 @@ void FileCompress::CompressFile(const string& strFilePath)
 			break;
 		for (size_t i = 0; i < rdsize; ++i)
 		{
-			string & strCode = _CharInfo[pReadBuff[i]]._strCode;
+			string & strCode = _CharInfo[pReadBuff[i]]._strCode;//字符编码
 			for (size_t j = 0; j < strCode.size(); ++j)
 			{
 				ch <<= 1;
-				if ('1' == strCode[j])
+				if ('1' == strCode[j])//以比特位的形式存入ch中
 					ch |= 1;
 				bitcount++;
 				if (8 == bitcount)
 				{
-					fputc(ch,Fout);
+					fputc(ch,Fout);//当满一个字节后，存入压缩文件中
 					ch = 0;
 					bitcount = 0;
 				}
 			}
 		}
 	}
-	if (bitcount > 0 && bitcount < 8)
+	if (bitcount > 0 && bitcount < 8)//文件最后未满8比特位的字节
 	{
 		ch <<= (8-bitcount);
 		fputc(ch,Fout);
@@ -84,6 +88,80 @@ void FileCompress::CompressFile(const string& strFilePath)
 	fclose(Fin);
 	fclose(Fout);
 }
+
+//获取huffman编码
+void FileCompress::GetHuffmanCode(HTNode<CharInfo>* pRoot)
+{
+	if (nullptr == pRoot)
+		return;
+
+	GetHuffmanCode(pRoot->_pLeft);//递归遍历左节点
+	GetHuffmanCode(pRoot->_pRight);//递归遍历右节点
+
+	if (nullptr == pRoot->_pLeft && nullptr == pRoot->_pRight)//左节点和右节点同时为空，就是叶子节点
+	{
+		HTNode<CharInfo>* pCur = pRoot;//叶子节点定为pCur
+		HTNode<CharInfo>* pParent = pCur->_pParent;//该叶子节点称为pParent
+
+		std::string& strCode = _CharInfo[pCur->_weight._ch]._strCode;
+		while (pParent)//一直倒着从叶子节点到根节点进行编码,直到跟节点为空
+		{
+			if (pCur == pParent->_pLeft)//如果pCur节点是双亲节点的左子树，置0
+				strCode += '0';
+			else//如果pCur节点是双亲节点的右子树，置1
+				strCode += '1';
+
+			pCur = pParent;
+			pParent = pCur->_pParent;
+		}
+		reverse(strCode.begin(), strCode.end());//我们是从叶子节点到根节点倒序排列字符串编码的，现在需要逆序恢复从根节点到叶子节点的编码排序
+	}
+}
+
+
+
+//压缩文件的头部信息保留着原来的压缩信息
+void FileCompress::WriteHeadInfo(FILE* pf, const std::string& strFileName)
+{
+	//获取源文件后缀
+	std::string postFix = strFileName.substr(strFileName.rfind('.'));
+	//有效编码的行数
+	size_t LineCount = 0;
+	//有效字符及其出现的次数
+	std::string strCharCount;
+	char buff[1024] = { 0 };
+	for (size_t i = 0; i < 256; ++i)//通过这个for循环，就可以从结构体数组中得到有效字符信息
+	{
+		if (0 != _CharInfo[i]._count)
+		{
+			strCharCount += _CharInfo[i]._ch;
+			strCharCount += ',';
+			memset(buff, 0, 1024);
+			_itoa(_CharInfo[i]._count, buff, 10);
+			strCharCount += buff;
+			strCharCount += "\n";
+			LineCount++;
+		}
+	}
+
+	//把三部分内容准备好后，开始整合三部分内容
+	std::string strHeadInfo;
+	strHeadInfo += postFix;
+	strHeadInfo += "\n";
+
+	/*memset(buff, 0, 1024);
+	_itoa(LineCount, buff, 10);
+	strHeadInfo += buff;*/
+	strHeadInfo += std::to_string(LineCount);
+	strHeadInfo += "\n";
+
+	strHeadInfo += strCharCount;
+
+	//整合信息完毕后，写入到压缩文件中去
+	fwrite(strHeadInfo.c_str(), 1, strHeadInfo.size(), pf);//每个元素以1字节形式写入
+}
+
+
 //解压缩
 void FileCompress::UNCompressFile(const std::string& strFilePath)
 {
@@ -102,7 +180,7 @@ void FileCompress::UNCompressFile(const std::string& strFilePath)
 		return;
 	}
 
-	//提取压缩文件头部信息第一行【后缀名】
+	//提取压缩文件头部信息第一行[后缀名]
 	postFix = "";
 	Getline(fIn, postFix);
 
@@ -131,10 +209,9 @@ void FileCompress::UNCompressFile(const std::string& strFilePath)
 	HuffmanTree<CharInfo> ht;//类的实例化
 	ht.CreateHuffmanTree(_CharInfo, CharInfo(0));
 
-	//解压缩
+	//开始解压缩
 	size_t finish = strFilePath.rfind('.');//从后往前，找到点的下标
 	std::string strUNFileName(strFilePath.substr(0, finish));//获取后缀之前文件名
-	strUNFileName += "(副本)";
 	strUNFileName += postFix;//文件名加上源文件后缀名
 	FILE* fOut = fopen(strUNFileName.c_str(), "wb");//打开解压缩后放内容的文件
 	if (nullptr == fOut)
@@ -183,76 +260,6 @@ void FileCompress::UNCompressFile(const std::string& strFilePath)
 	fclose(fIn);
 	fclose(fOut);
 }
-
-//获取huffman编码
-void FileCompress::GetHuffmanCode(HTNode<CharInfo>* pRoot)
-{
-	if (nullptr == pRoot)
-		return;
-
-	GetHuffmanCode(pRoot->_pLeft);//递归遍历左节点
-	GetHuffmanCode(pRoot->_pRight);//递归遍历右节点
-
-	if (nullptr == pRoot->_pLeft && nullptr == pRoot->_pRight)//左节点和右节点同时为空，就是叶子节点
-	{
-		HTNode<CharInfo>* pCur = pRoot;//叶子节点定为pCur
-		HTNode<CharInfo>* pParent = pCur->_pParent;//该叶子节点称为pParent
-
-		std::string& strCode = _CharInfo[pCur->_weight._ch]._strCode;
-		while (pParent)//一直倒着从叶子节点到根节点进行编码,直到跟节点为空
-		{
-			if (pCur == pParent->_pLeft)//如果pCur节点是双亲节点的左子树，置0
-				strCode += '0';
-			else//如果pCur节点是双亲节点的右子树，置1
-				strCode += '1';
-
-			pCur = pParent;
-			pParent = pCur->_pParent;
-		}
-		reverse(strCode.begin(), strCode.end());//我们是从叶子节点到根节点倒序排列字符串编码的，现在需要逆序恢复从根节点到叶子节点的编码排序
-	}
-}
-
-//压缩文件的头部信息保留着原来的压缩信息
-void FileCompress::WriteHeadInfo(FILE* pf, const std::string& strFileName)
-{
-	//获取源文件后缀
-	std::string postFix = strFileName.substr(strFileName.rfind('.'));
-	//有效编码的行数
-	size_t LineCount = 0;
-	//有效字符及其出现的次数
-	std::string strCharCount;
-	char buff[1024] = { 0 };
-	for (size_t i = 0; i < 256; ++i)//通过这个for循环，就可以从结构体数组中得到有效字符信息
-	{
-		if (0 != _CharInfo[i]._count)
-		{
-			strCharCount += _CharInfo[i]._ch;
-			strCharCount += ',';
-			memset(buff, 0, 1024);
-			_itoa(_CharInfo[i]._count, buff, 10);
-			strCharCount += buff;
-			strCharCount += "\n";
-			LineCount++;
-		}
-	}
-
-	//把三部分内容准备好后，开始整合三部分内容
-	std::string strHeadInfo;
-	strHeadInfo += postFix;
-	strHeadInfo += "\n";
-
-	memset(buff, 0, 1024);
-	_itoa(LineCount, buff, 10);
-	strHeadInfo += buff;
-	strHeadInfo += "\n";
-
-	strHeadInfo += strCharCount;
-
-	//整合信息完毕后，写入到压缩文件中去
-	fwrite(strHeadInfo.c_str(), 1, strHeadInfo.size(), pf);
-}
-
 
 //按行获取压缩文件首部信息
 void FileCompress::Getline(FILE* pf, std::string& strContent)

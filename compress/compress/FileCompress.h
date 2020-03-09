@@ -32,15 +32,16 @@ struct CharInfo
 
 class FileCompress
 {
+	friend class GZIP;
 public:
 	FileCompress();//构造函数
 	void CompressFile(const string& strFilePath);//文件压缩函数
 	void UNCompressFile(const string& strFilePath);//文件解压缩函数
-
+	void Getline(FILE* pf, string& strContent);
 private:
 	void GetHuffmanCode(HTNode<CharInfo>* pRoot);//Huffman编码
 	void WriteHeadInfo(FILE* pf,const string& strFileName);//解压缩需要原来的文件信息[文件后缀、字符行数、字符及其对应的次数、压缩文件]
-	void Getline(FILE* pf,string& strContent);
+	
 private:
 	vector<CharInfo> _CharInfo;//256个字符结构体数组
 };

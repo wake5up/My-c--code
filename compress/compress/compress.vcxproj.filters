@@ -21,12 +21,27 @@
     <ClCompile Include="FileCompressTest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="LZHashTable.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="LZ77.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileCompress.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="HuffmanTree.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="LZHashTable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="LZ77.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
