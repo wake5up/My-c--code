@@ -1,5 +1,6 @@
 //判断是否为二叉搜索树
 
+方法一：
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -24,7 +25,7 @@ public:
     }
 };
 
-
+方法二：
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
